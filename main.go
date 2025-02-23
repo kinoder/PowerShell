@@ -46,7 +46,7 @@ func main() {
 
 	}
 }
-
+//1
 func exitCommand(arguments []string) {
 	var status int
 	var err error
@@ -70,7 +70,7 @@ func exitCommand(arguments []string) {
 		fmt.Println("too many arguments")
 	}
 }
-
+//2
 func echoCommand(arguments []string) {
 	if len(arguments) == 0 {
 		fmt.Println()
@@ -87,7 +87,7 @@ func echoCommand(arguments []string) {
 	}
 	fmt.Println(strings.Join(result, " "))
 }
-
+//3
 func catCommand(arguments []string) {
 	if len(arguments) == 0 {
 		fmt.Println("file does not exist")
@@ -107,7 +107,7 @@ func catCommand(arguments []string) {
 		fmt.Println()
 	}
 }
-
+//6
 func pwdCommand(arguments []string) {
 	if len(arguments) > 0 {
 		fmt.Println("pwd command does not have any argument")
