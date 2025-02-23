@@ -25,6 +25,12 @@ func main() {
 				{
 					exitCommand(args[1:])
 				}
+			case "echo":
+				{
+					echoCommand(args[1:])
+				}
+			default:
+				fmt.Println("this command is not recognized as an internal or external command,operable program or batch file.")
 			}
 		} else {
 			fmt.Println("cannot read input")
@@ -55,4 +61,21 @@ func exitCommand(arguments []string) {
 	} else {
 		fmt.Println("too many arguments")
 	}
+}
+
+func echoCommand(arguments []string) {
+	if len(arguments) == 0 {
+		fmt.Println()
+		return
+	}
+	result := make([]string, 0, len(arguments))
+	for _, arg := range arguments {
+		if strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'") || strings.HasPrefix(arg, "\"") && strings.HasSuffix(arg, "\"") {
+			result = append(result, arg[1:len(arg)-1])
+		} else {
+			replaced := os.ExpandEnv(arg)
+			result = append(result, replaced)
+		}
+	}
+	fmt.Println(strings.Join(result, " "))
 }
