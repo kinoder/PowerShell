@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -11,7 +12,6 @@ import (
 func main() {
 
 	reader := bufio.NewReader(os.Stdin)
-
 	for {
 		fmt.Print("$ ")
 		input, err := reader.ReadString('\n')
@@ -28,6 +28,10 @@ func main() {
 			case "echo":
 				{
 					echoCommand(args[1:])
+				}
+			case "cat":
+				{
+					catCommand(args[1:])
 				}
 			default:
 				fmt.Println("this command is not recognized as an internal or external command,operable program or batch file.")
@@ -78,4 +82,24 @@ func echoCommand(arguments []string) {
 		}
 	}
 	fmt.Println(strings.Join(result, " "))
+}
+func catCommand(arguments []string) {
+	if len(arguments) == 0 {
+		fmt.Println("file does not exist")
+		return
+	}
+	for _, fname := range arguments {
+		file, err := os.Open(fname)
+		if err != nil {
+			fmt.Printf("cannot open %s. error : %v\n", fname, err)
+			return
+		}
+		defer file.Close()
+		_, err = io.Copy(os.Stdout, file)
+		if err != nil {
+			fmt.Printf("cannot read %s. error : %v\n", fname, err)
+		}
+		fmt.Println()
+	}
+
 }
