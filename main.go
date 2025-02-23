@@ -33,6 +33,10 @@ func main() {
 				{
 					catCommand(args[1:])
 				}
+			case "pwd":
+				{
+					pwdCommand(args[1:])
+				}
 			default:
 				fmt.Println("this command is not recognized as an internal or external command,operable program or batch file.")
 			}
@@ -83,6 +87,7 @@ func echoCommand(arguments []string) {
 	}
 	fmt.Println(strings.Join(result, " "))
 }
+
 func catCommand(arguments []string) {
 	if len(arguments) == 0 {
 		fmt.Println("file does not exist")
@@ -101,5 +106,17 @@ func catCommand(arguments []string) {
 		}
 		fmt.Println()
 	}
+}
 
+func pwdCommand(arguments []string) {
+	if len(arguments) > 0 {
+		fmt.Println("pwd command does not have any argument")
+		return
+	}
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("error getting current directory")
+		return
+	}
+	fmt.Println(dir)
 }
