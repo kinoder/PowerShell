@@ -37,8 +37,12 @@ func main() {
 				{
 					pwdCommand(args[1:])
 				}
+			case "cd":
+				{
+					cdCommand(args[1:])
+				}
 			default:
-				fmt.Println("this command is not recognized as an internal or external command,operable program or batch file.")
+				fmt.Printf("%s : command not found\n", args[0])
 			}
 		} else {
 			fmt.Println("cannot read input")
@@ -46,7 +50,8 @@ func main() {
 
 	}
 }
-//1
+
+// 1
 func exitCommand(arguments []string) {
 	var status int
 	var err error
@@ -70,7 +75,8 @@ func exitCommand(arguments []string) {
 		fmt.Println("too many arguments")
 	}
 }
-//2
+
+// 2
 func echoCommand(arguments []string) {
 	if len(arguments) == 0 {
 		fmt.Println()
@@ -87,7 +93,8 @@ func echoCommand(arguments []string) {
 	}
 	fmt.Println(strings.Join(result, " "))
 }
-//3
+
+// 3
 func catCommand(arguments []string) {
 	if len(arguments) == 0 {
 		fmt.Println("file does not exist")
@@ -107,7 +114,8 @@ func catCommand(arguments []string) {
 		fmt.Println()
 	}
 }
-//6
+
+// 6
 func pwdCommand(arguments []string) {
 	if len(arguments) > 0 {
 		fmt.Println("pwd command does not have any argument")
@@ -119,4 +127,9 @@ func pwdCommand(arguments []string) {
 		return
 	}
 	fmt.Println(dir)
+}
+
+// 7
+func cdCommand(arguemnts []string) {
+	
 }
