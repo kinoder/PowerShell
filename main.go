@@ -41,6 +41,7 @@ func main() {
 				{
 					cdCommand(args[1:])
 				}
+				//feature 8
 			default:
 				fmt.Printf("%s : command not found\n", args[0])
 			}
@@ -51,7 +52,7 @@ func main() {
 	}
 }
 
-// 1
+// feature 1
 func exitCommand(arguments []string) {
 	var status int
 	var err error
@@ -76,7 +77,7 @@ func exitCommand(arguments []string) {
 	}
 }
 
-// 2
+// feature 2
 func echoCommand(arguments []string) {
 	if len(arguments) == 0 {
 		fmt.Println()
@@ -94,7 +95,7 @@ func echoCommand(arguments []string) {
 	fmt.Println(strings.Join(result, " "))
 }
 
-// 3
+// feature 3
 func catCommand(arguments []string) {
 	if len(arguments) == 0 {
 		fmt.Println("file does not exist")
@@ -115,7 +116,7 @@ func catCommand(arguments []string) {
 	}
 }
 
-// 6
+// feature 6
 func pwdCommand(arguments []string) {
 	if len(arguments) > 0 {
 		fmt.Println("pwd command does not have any argument")
@@ -129,7 +130,20 @@ func pwdCommand(arguments []string) {
 	fmt.Println(dir)
 }
 
-// 7
-func cdCommand(arguemnts []string) {
-	
+// feature 7
+func cdCommand(arguments []string) {
+	if len(arguments) == 0 {
+		fmt.Println("please enter a path")
+		return
+	}
+	if len(arguments) > 1 {
+		fmt.Println("too many arguments")
+		return
+	}
+	dir := arguments[0]
+	err := os.Chdir(dir)
+	if err != nil {
+		fmt.Printf("directory %s does not exist\n",dir)
+		return
+	}
 }
