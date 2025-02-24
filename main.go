@@ -155,8 +155,7 @@ func typeCommand(arguments []string) {
 	fmt.Printf("%s: command not found\n", arguments[0])
 }
 
-// feature 5
-
+// feature 5,8
 func executeCommand(arguments []string) {
 	command := arguments[0]
 	paths := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
