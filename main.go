@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -15,6 +16,9 @@ func main() {
 	for {
 		fmt.Print("$ ")
 		input, err := reader.ReadString('\n')
+		//input += " "
+		//input2 := "type go.exe"
+		//var err error = nil
 		if err == nil {
 			args := strings.Fields(input)
 			if len(args) == 0 {
@@ -22,25 +26,19 @@ func main() {
 			}
 			switch args[0] {
 			case "exit":
-				{
-					exitCommand(args[1:])
-				}
+				exitCommand(args[1:])
 			case "echo":
-				{
-					echoCommand(args[1:])
-				}
+				echoCommand(args[1:])
 			case "cat":
-				{
-					catCommand(args[1:])
-				}
+				catCommand(args[1:])
+			case "type":
+				typeCommand(args[1:])
 			case "pwd":
-				{
-					pwdCommand(args[1:])
-				}
+				pwdCommand(args[1:])
 			case "cd":
-				{
-					cdCommand(args[1:])
-				}
+				cdCommand(args[1:])
+			case "login":
+				loginCommand(args[1:])
 				//feature 8
 			default:
 				fmt.Printf("%s : command not found\n", args[0])
@@ -116,6 +114,46 @@ func catCommand(arguments []string) {
 	}
 }
 
+// feature 4
+func typeCommand(arguments []string) {
+	if len(arguments) != 1 {
+		fmt.Println("missing arguments or too many arguments")
+		return
+	}
+	command := arguments[0] + ".exe"
+	builtInTypes := map[string]bool{
+		"exit": true, "echo": true, "cat": true, "pwd": true, "type": true, "cd": true, "login": true, "adduser": true, "logout": true,
+		"history": true,
+	}
+
+	for k := range builtInTypes {
+		if arguments[0] == k {
+			fmt.Printf("%s is a shell builtin\n", arguments[0])
+			return
+		}
+	}
+	env := os.Getenv("PATH")
+	paths := strings.Split(env, string(os.PathListSeparator))
+
+	for _, dir := range paths {
+
+		dir = strings.TrimSpace(dir)
+		if dir == "" {
+			continue
+		}
+		path := filepath.Join(dir, command)
+
+		info, err := os.Stat(path)
+		if err == nil {
+			if info.Mode().IsRegular() {
+				fmt.Printf("%s is %s\n", arguments[0], path)
+				return
+			}
+		}
+	}
+	fmt.Printf("%s: command not found\n", arguments[0])
+}
+
 // feature 6
 func pwdCommand(arguments []string) {
 	if len(arguments) > 0 {
@@ -143,7 +181,15 @@ func cdCommand(arguments []string) {
 	dir := arguments[0]
 	err := os.Chdir(dir)
 	if err != nil {
-		fmt.Printf("directory %s does not exist\n",dir)
+		fmt.Printf("directory %s does not exist\n", dir)
+		return
+	}
+}
+
+// feature 9
+func loginCommand(arguments []string) {
+	if len(arguments) == 0 {
+		fmt.Println("missing arguments")
 		return
 	}
 }
