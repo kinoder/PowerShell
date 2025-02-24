@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -41,7 +42,7 @@ func main() {
 				loginCommand(args[1:])
 				//feature 8
 			default:
-				fmt.Printf("%s : command not found\n", args[0])
+				executeCommand(args)
 			}
 		} else {
 			fmt.Println("cannot read input")
@@ -152,6 +153,36 @@ func typeCommand(arguments []string) {
 		}
 	}
 	fmt.Printf("%s: command not found\n", arguments[0])
+}
+
+// feature 5
+
+func executeCommand(arguments []string) {
+	command := arguments[0]
+	paths := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
+	var cmdPath string
+	for _, dir := range paths {
+		fullPath := filepath.Join(dir, command)
+
+		info, err := os.Stat(fullPath + ".exe")
+		if err == nil && !info.IsDir() {
+			cmdPath = fullPath
+			break
+		}
+	}
+
+	if cmdPath == "" {
+		fmt.Printf("%s: command not found\n", command)
+		return
+	}
+
+	cmd := exec.Command(cmdPath, arguments[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("%s: %v\n", strings.Join(arguments, " "), err)
+	}
 }
 
 // feature 6
