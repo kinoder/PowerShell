@@ -198,7 +198,7 @@ func AddUser(arguments []string) {
 	}
 	err := CreateUser(DB, user)
 	if err != nil {
-		fmt.Printf("cannot create user : %v", err)
+		fmt.Printf("cannot create user : %v\n", err)
 		return
 	}
 	fmt.Println("user created successfully")

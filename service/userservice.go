@@ -16,7 +16,8 @@ func CreateUser(db *gorm.DB, user *models.User) error {
 		return errors.New("please enter password")
 	}
 	var existingUser models.User
-	if err := db.Where("username = ?", user.Username).First(&existingUser).Error; err == nil {
+	err := db.Where("username = ?", user.Username).First(&existingUser).Error
+	if err == nil {
 		return errors.New("duplicate user exists with this username")
 	}
 	if err := db.Create(user).Error; err != nil {

@@ -14,8 +14,8 @@ func main() {
 	for {
 		fmt.Print("$ ")
 		input, err := reader.ReadString('\n')
-		//input += " "
-		//input2 := "type go.exe"
+		input += " "
+		//input2 := "adduser arminssss 12345"
 		//var err error = nil
 		if err == nil {
 			args := strings.Fields(input)
