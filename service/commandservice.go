@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var DB = database.DB
@@ -260,6 +261,9 @@ func ShowHistory() {
 			return
 		}
 		sort.Slice(common.LogHistory, func(i, j int) bool {
+			if common.LogHistory[i].Count == common.LogHistory[j].Count {
+				return common.LogHistory[i].CreatedAt.After(common.LogHistory[j].CreatedAt)
+			}
 			return common.LogHistory[i].Count > common.LogHistory[j].Count
 		})
 		fmt.Println("| Command | Count |")
@@ -280,8 +284,9 @@ func AddHistory(command string) {
 			}
 		}
 		common.LogHistory = append(common.LogHistory, models.LogHistory{
-			Command: command,
-			Count:   1,
+			Command:   command,
+			Count:     1,
+			CreatedAt: time.Now(),
 		})
 	}
 }
