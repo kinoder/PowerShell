@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -214,10 +215,73 @@ func AddUser(arguments []string) {
 	fmt.Println("user created successfully")
 }
 
+// feature 9
 func Logout(arguments []string) {
 	if len(arguments) != 0 {
 		fmt.Println("invalid argument")
 		return
 	}
 	common.LoginUser.Username = ""
+}
+
+// feature 10
+func HistoryCommand(arguments []string) {
+	if len(arguments) > 1 {
+		fmt.Println("invalid arguments")
+		return
+	}
+	if len(arguments) == 1 {
+		if arguments[0] != "clear" {
+			fmt.Println("invalid argument")
+			return
+		}
+		if arguments[0] == "clear" {
+			ClearHistory()
+			return
+		}
+	}
+	ShowHistory()
+}
+
+// feature 10
+func ClearHistory() {
+	//clear history for unlogged users
+	if common.LoginUser.Username == "" {
+		common.LogHistory = make([]models.LogHistory, 0)
+	}
+}
+
+// feature 10
+func ShowHistory() {
+	//show history for unlogged users
+	if common.LoginUser.Username == "" {
+		if len(common.LogHistory) == 0 {
+			fmt.Println("empty command history")
+			return
+		}
+		sort.Slice(common.LogHistory, func(i, j int) bool {
+			return common.LogHistory[i].Count > common.LogHistory[j].Count
+		})
+		fmt.Println("| Command | Count |")
+		for _, v := range common.LogHistory {
+			fmt.Printf("| %s | %d |\n", v.Command, v.Count)
+		}
+	}
+}
+
+// feature 10
+func AddHistory(command string) {
+	//adding to hsitory for unlogged users
+	if common.LoginUser.Username == "" {
+		for i, v := range common.LogHistory {
+			if v.Command == command {
+				common.LogHistory[i].Count++
+				return
+			}
+		}
+		common.LogHistory = append(common.LogHistory, models.LogHistory{
+			Command: command,
+			Count:   1,
+		})
+	}
 }

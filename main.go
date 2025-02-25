@@ -19,13 +19,15 @@ func main() {
 			fmt.Print("$ ")
 		}
 		input, err := reader.ReadString('\n')
-		input += " "
 		//input2 := "adduser arminssss 12345"
 		//var err error = nil
 		if err == nil {
 			args := strings.Fields(input)
 			if len(args) == 0 {
 				continue
+			}
+			if args[0] != "history" {
+				service.AddHistory(args[0])
 			}
 			switch args[0] {
 			case "exit":
@@ -46,6 +48,8 @@ func main() {
 				service.AddUser(args[1:])
 			case "logout":
 				service.Logout(args[1:])
+			case "history":
+				service.HistoryCommand(args[1:])
 				//feature 8
 			default:
 				service.ExecuteCommand(args)

@@ -5,3 +5,5 @@ import (
 )
 
 var LoginUser = &models.User{Username: "", Password: ""}
+
+var LogHistory = make([]models.LogHistory, 0)
