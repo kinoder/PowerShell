@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	common "hamkaran_system/bootcamp/final/project/common"
 	"hamkaran_system/bootcamp/final/project/database"
 	models "hamkaran_system/bootcamp/final/project/model"
 	"io"
@@ -181,12 +182,21 @@ func CdCommand(arguments []string) {
 
 // feature 9
 func LoginCommand(arguments []string) {
-	if len(arguments) == 0 {
-		fmt.Println("missing arguments")
+	if len(arguments) != 2 {
+		fmt.Println("invalid arguments")
 		return
 	}
+	user := &models.User{Username: arguments[0], Password: arguments[1]}
+	var existingUser models.User
+	err := DB.Where("username = ?", user.Username).First(&existingUser).Error
+	if err != nil || user.Password != existingUser.Password {
+		fmt.Println("invalid username or password")
+		return
+	}
+	common.LoginUser.Username = user.Username
 }
 
+// feature 9
 func AddUser(arguments []string) {
 	if len(arguments) != 2 {
 		fmt.Println("invalid arguments")
@@ -202,4 +212,12 @@ func AddUser(arguments []string) {
 		return
 	}
 	fmt.Println("user created successfully")
+}
+
+func Logout(arguments []string) {
+	if len(arguments) != 0 {
+		fmt.Println("invalid argument")
+		return
+	}
+	common.LoginUser.Username = ""
 }

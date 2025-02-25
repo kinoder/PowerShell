@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"hamkaran_system/bootcamp/final/project/common"
 	"hamkaran_system/bootcamp/final/project/service"
 	"os"
 	"strings"
@@ -12,7 +13,11 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Print("$ ")
+		if common.LoginUser.Username != "" {
+			fmt.Print(common.LoginUser.Username + ":" + "$ ")
+		} else {
+			fmt.Print("$ ")
+		}
 		input, err := reader.ReadString('\n')
 		input += " "
 		//input2 := "adduser arminssss 12345"
@@ -39,6 +44,8 @@ func main() {
 				service.LoginCommand(args[1:])
 			case "adduser":
 				service.AddUser(args[1:])
+			case "logout":
+				service.Logout(args[1:])
 				//feature 8
 			default:
 				service.ExecuteCommand(args)
