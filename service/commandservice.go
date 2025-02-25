@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"hamkaran_system/bootcamp/final/project/database"
+	models "hamkaran_system/bootcamp/final/project/model"
 	"io"
 	"os"
 	"os/exec"
@@ -9,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 )
+
+var DB = database.DB
 
 // feature 1
 func ExitCommand(arguments []string) {
@@ -181,4 +185,21 @@ func LoginCommand(arguments []string) {
 		fmt.Println("missing arguments")
 		return
 	}
+}
+
+func AddUser(arguments []string) {
+	if len(arguments) != 2 {
+		fmt.Println("invalid arguments")
+		return
+	}
+	var user = &models.User{
+		Username: arguments[0],
+		Password: arguments[1],
+	}
+	err := CreateUser(DB, user)
+	if err != nil {
+		fmt.Printf("cannot create user : %v", err)
+		return
+	}
+	fmt.Println("user created successfully")
 }

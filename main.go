@@ -37,6 +37,8 @@ func main() {
 				service.CdCommand(args[1:])
 			case "login":
 				service.LoginCommand(args[1:])
+			case "adduser":
+				service.AddUser(args[1:])
 				//feature 8
 			default:
 				service.ExecuteCommand(args)
