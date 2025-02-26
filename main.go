@@ -19,15 +19,13 @@ func main() {
 			fmt.Print("$ ")
 		}
 		input, err := reader.ReadString('\n')
-		//input2 := "adduser arminssss 12345"
-		//var err error = nil
 		if err == nil {
 			args := strings.Fields(input)
 			if len(args) == 0 {
 				continue
 			}
 			if args[0] != "history" {
-				service.AddHistory(args[0])
+				service.AddHistory(args)
 			}
 			switch args[0] {
 			case "exit":

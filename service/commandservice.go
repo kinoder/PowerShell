@@ -301,16 +301,17 @@ func ShowHistory() {
 }
 
 // feature 10
-func AddHistory(command string) {
+func AddHistory(command []string) {
+	commands := strings.Join(command, " ")
 	if common.LoginUser.Username == "" {
 		for i, v := range common.LogHistory {
-			if v.Command == command {
+			if v.Command == commands {
 				common.LogHistory[i].Count++
 				return
 			}
 		}
 		common.LogHistory = append(common.LogHistory, models.LogHistory{
-			Command:   command,
+			Command:   commands,
 			Count:     1,
 			CreatedAt: time.Now(),
 		})
@@ -324,7 +325,7 @@ func AddHistory(command string) {
 		} else {
 			newHistory := models.LogHistory{
 				UserId:    common.LoginUser.ID,
-				Command:   command,
+				Command:   commands,
 				Count:     1,
 				CreatedAt: time.Now(),
 			}
