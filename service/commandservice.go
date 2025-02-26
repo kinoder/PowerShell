@@ -200,7 +200,8 @@ func LoginCommand(arguments []string) {
 		fmt.Println("invalid username or password")
 		return
 	}
-	common.LoginUser.Username = user.Username
+	common.LoginUser.Username = existingUser.Username
+	common.LoginUser.ID = existingUser.ID
 }
 
 // feature 9
@@ -280,7 +281,6 @@ func ShowHistory() {
 
 // feature 10
 func AddHistory(command string) {
-	//adding to hsitory for unlogged users
 	if common.LoginUser.Username == "" {
 		for i, v := range common.LogHistory {
 			if v.Command == command {
@@ -293,5 +293,21 @@ func AddHistory(command string) {
 			Count:     1,
 			CreatedAt: time.Now(),
 		})
+	} else {
+		var history models.LogHistory
+		err := DB.Where("user_id = ? AND command = ?", common.LoginUser.ID, command).First(&history).Error
+		if err == nil {
+			history.Count++
+			history.CreatedAt = time.Now()
+			DB.Save(&history)
+		} else {
+			newHistory := models.LogHistory{
+				UserId:    common.LoginUser.ID,
+				Command:   command,
+				Count:     1,
+				CreatedAt: time.Now(),
+			}
+			DB.Create(&newHistory)
+		}
 	}
 }

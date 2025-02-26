@@ -26,7 +26,7 @@ func main() {
 			if len(args) == 0 {
 				continue
 			}
-			if args[0] != "history" && common.LoginUser.Username == "" {
+			if args[0] != "history" {
 				service.AddHistory(args[0])
 			}
 			switch args[0] {
