@@ -293,7 +293,6 @@ func ShowHistory() {
 			return
 		}
 		fmt.Println("| Command         | Count |")
-		fmt.Println("|----------------|-------|")
 		for _, v := range userHistory {
 			fmt.Printf("| %-15s | %-5d |\n", v.Command, v.Count)
 		}
