@@ -260,7 +260,6 @@ func ClearHistory() {
 
 // feature 10
 func ShowHistory() {
-	//show history for unlogged users
 	if common.LoginUser.Username == "" {
 		if len(common.LogHistory) == 0 {
 			fmt.Println("empty command history")
@@ -274,6 +273,22 @@ func ShowHistory() {
 		})
 		fmt.Println("| Command | Count |")
 		for _, v := range common.LogHistory {
+			fmt.Printf("| %-15s | %-5d |\n", v.Command, v.Count)
+		}
+	} else {
+		var userHistory []models.LogHistory
+		err := DB.Where("user_id = ?", common.LoginUser.ID).Order("count DESC, created_at DESC").Find(&userHistory).Error
+		if err != nil {
+			fmt.Println("error fetching history:", err)
+			return
+		}
+		if len(userHistory) == 0 {
+			fmt.Println("empty command history")
+			return
+		}
+		fmt.Println("| Command         | Count |")
+		fmt.Println("|----------------|-------|")
+		for _, v := range userHistory {
 			fmt.Printf("| %-15s | %-5d |\n", v.Command, v.Count)
 		}
 	}
