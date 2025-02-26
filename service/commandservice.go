@@ -252,9 +252,15 @@ func HistoryCommand(arguments []string) {
 
 // feature 10
 func ClearHistory() {
-	//clear history for unlogged users
 	if common.LoginUser.Username == "" {
 		common.LogHistory = make([]models.LogHistory, 0)
+	} else {
+		err := DB.Where("user_id = ?", common.LoginUser.ID).Delete(&models.LogHistory{}).Error
+		if err != nil {
+			fmt.Println("error clearing history:", err)
+			return
+		}
+		fmt.Println("command history cleared for user:", common.LoginUser.Username)
 	}
 }
 
