@@ -191,7 +191,12 @@ func LoginCommand(arguments []string) {
 	user := &models.User{Username: arguments[0], Password: arguments[1]}
 	var existingUser models.User
 	err := DB.Where("username = ?", user.Username).First(&existingUser).Error
-	if err != nil || user.Password != existingUser.Password {
+	if err != nil {
+		fmt.Println("invalid username or password")
+		return
+	}
+	err = CheckPassword(arguments[1], existingUser.Password)
+	if err != nil {
 		fmt.Println("invalid username or password")
 		return
 	}
