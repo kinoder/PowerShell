@@ -273,7 +273,7 @@ func ShowHistory() {
 		})
 		fmt.Println("| Command | Count |")
 		for _, v := range common.LogHistory {
-			fmt.Printf("| %s | %d |\n", v.Command, v.Count)
+			fmt.Printf("| %-15s | %-5d |\n", v.Command, v.Count)
 		}
 	}
 }
