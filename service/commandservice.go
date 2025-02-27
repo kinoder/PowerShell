@@ -44,21 +44,10 @@ func ExitCommand(arguments []string) {
 
 // feature 2
 func EchoCommand(arguments []string) {
-	if len(arguments) == 0 {
-		fmt.Println()
-		return
-	}
-	result := make([]string, 0, len(arguments))
-	for _, arg := range arguments {
-		if strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'") || strings.HasPrefix(arg, "\"") && strings.HasSuffix(arg, "\"") {
-			result = append(result, arg[1:len(arg)-1])
-		} else {
-			replaced := os.ExpandEnv(arg)
-			result = append(result, replaced)
-		}
-	}
-	fmt.Println(strings.Join(result, " "))
+	joinedArgs := strings.Join(arguments, " ")
+	fmt.Println(processArgument(joinedArgs))
 }
+
 
 // feature 3
 func CatCommand(arguments []string) {
@@ -332,3 +321,73 @@ func AddHistory(command []string) {
 		}
 	}
 }
+
+////////////////////////////////////////////////
+func processArgument(arg string) string {
+	if len(arg) > 1 && arg[0] == '"' && arg[len(arg)-1] == '"' {
+		return parseDoubleQuoted(arg[1 : len(arg)-1])
+	} else if len(arg) > 1 && arg[0] == '\'' && arg[len(arg)-1] == '\'' {
+		return arg[1 : len(arg)-1]
+	}
+	return expandEnvVariables(arg)
+}
+
+func parseDoubleQuoted(input string) string {
+	var result strings.Builder
+	for i := 0; i < len(input); i++ {
+		if input[i] == '\\' && i+1 < len(input) {
+			switch input[i+1] {
+			case '$', '`', '"', '\\':
+				i++
+				result.WriteByte(input[i])
+			case 'n':
+				i++
+				result.WriteByte('\n')
+			default:
+				result.WriteByte(input[i])
+			}
+		} else {
+			result.WriteByte(input[i])
+		}
+	}
+	return result.String()
+}
+
+func expandEnvVariables(input string) string {
+	var result strings.Builder
+	var i int
+	for i < len(input) {
+		if input[i] == '$' && i+1 < len(input) && (isAlpha(input[i+1]) || input[i+1] == '_') {
+			j := i + 1
+			for j < len(input) && (isAlphaNum(input[j]) || input[j] == '_') {
+				j++
+			}
+			varName := input[i+1 : j]
+			value := os.Getenv(varName) // استفاده از os.Getenv
+			if value != "" {
+				result.WriteString(value)
+			} else {
+				result.WriteString("$")
+				result.WriteString(varName)
+			}
+			i = j
+		} else {
+			if input[i] == '\\' && i+1 < len(input) && (input[i+1] == '$' || input[i+1] == '`' || input[i+1] == '"' || input[i+1] == '\\') {
+				i++
+			}
+			result.WriteByte(input[i])
+			i++
+		}
+	}
+	return result.String()
+}
+
+
+func isAlpha(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+}
+
+func isAlphaNum(c byte) bool {
+	return isAlpha(c) || (c >= '0' && c <= '9')
+}
+
