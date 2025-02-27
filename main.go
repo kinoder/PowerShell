@@ -31,7 +31,7 @@ func main() {
 				fileName := args[len(args)-1]
 				args = args[:len(args)-2]
 				if builtInCommand(args[0]) {
-
+					service.OutputRedirectionBuiltInCommandRed(args,fileName)
 				} else {
 					service.OutputRedirectionCommand(args, fileName)
 				}

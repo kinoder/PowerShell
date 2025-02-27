@@ -320,6 +320,7 @@ func AddHistory(command []string) {
 		}
 	}
 }
+
 func OutputRedirectionCommand(argumetns []string, fileName string) {
 	cmd := exec.Command(argumetns[0], argumetns[1:]...)
 	file, err := os.Create(fileName)
@@ -336,6 +337,10 @@ func OutputRedirectionCommand(argumetns []string, fileName string) {
 	if err != nil {
 		fmt.Println("Error executing command:", err)
 	}
+}
+
+func OutputRedirectionBuiltInCommandRed(arguments []string, fileName string) {
+
 }
 
 // //////////////////////////////////////////////
@@ -379,7 +384,7 @@ func expandEnvVariables(input string) string {
 				j++
 			}
 			varName := input[i+1 : j]
-			value := os.Getenv(varName) 
+			value := os.Getenv(varName)
 			if value != "" {
 				result.WriteString(value)
 			} else {
@@ -404,4 +409,27 @@ func isAlpha(c byte) bool {
 
 func isAlphaNum(c byte) bool {
 	return isAlpha(c) || (c >= '0' && c <= '9')
+}
+
+func writeToFile(input string, fileName string) {
+	file, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println("cannot create file: ", err)
+		return
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(input)
+	if err != nil {
+		fmt.Println("cannot write to file : ", err)
+	}
+}
+
+func readFile(fileName string) string {
+	content, err := os.ReadFile(fileName)
+
+	if err != nil {
+		fmt.Println("cannot read the file : ", err)
+	}
+	return string(content)
 }
