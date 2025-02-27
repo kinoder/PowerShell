@@ -48,7 +48,6 @@ func EchoCommand(arguments []string) {
 	fmt.Println(processArgument(joinedArgs))
 }
 
-
 // feature 3
 func CatCommand(arguments []string) {
 	if len(arguments) == 0 {
@@ -321,8 +320,25 @@ func AddHistory(command []string) {
 		}
 	}
 }
+func OutputRedirectionCommand(argumetns []string, fileName string) {
+	cmd := exec.Command(argumetns[0], argumetns[1:]...)
+	file, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
 
-////////////////////////////////////////////////
+	cmd.Stdout = file
+	cmd.Stderr = file
+
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println("Error executing command:", err)
+	}
+}
+
+// //////////////////////////////////////////////
 func processArgument(arg string) string {
 	if len(arg) > 1 && arg[0] == '"' && arg[len(arg)-1] == '"' {
 		return parseDoubleQuoted(arg[1 : len(arg)-1])
@@ -363,7 +379,7 @@ func expandEnvVariables(input string) string {
 				j++
 			}
 			varName := input[i+1 : j]
-			value := os.Getenv(varName) // استفاده از os.Getenv
+			value := os.Getenv(varName) 
 			if value != "" {
 				result.WriteString(value)
 			} else {
@@ -382,7 +398,6 @@ func expandEnvVariables(input string) string {
 	return result.String()
 }
 
-
 func isAlpha(c byte) bool {
 	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
 }
@@ -390,4 +405,3 @@ func isAlpha(c byte) bool {
 func isAlphaNum(c byte) bool {
 	return isAlpha(c) || (c >= '0' && c <= '9')
 }
-

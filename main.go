@@ -27,6 +27,16 @@ func main() {
 			if args[0] != "history" {
 				service.AddHistory(args)
 			}
+			if len(args) > 2 && (args[len(args)-2] == ">" || args[len(args)-2] == "1>") {
+				fileName := args[len(args)-1]
+				args = args[:len(args)-2]
+				if builtInCommand(args[0]) {
+
+				} else {
+					service.OutputRedirectionCommand(args, fileName)
+				}
+				continue
+			}
 			switch args[0] {
 			case "exit":
 				service.ExitCommand(args[1:])
@@ -56,5 +66,14 @@ func main() {
 			fmt.Println("cannot read input")
 		}
 
+	}
+}
+
+func builtInCommand(command string) bool {
+	switch command {
+	case "exit", "echo", "cat", "pwd", "type", "cd", "login", "adduser", "logout", "history":
+		return true
+	default:
+		return false
 	}
 }
