@@ -340,7 +340,34 @@ func OutputRedirectionCommand(argumetns []string, fileName string) {
 }
 
 func OutputRedirectionBuiltInCommandRed(arguments []string, fileName string) {
+	switch arguments[0] {
+	case "echo":
+		result := strings.Join(arguments[1:], " ")
+		writeToFile(result, fileName)
+	case "cat":
+		if len(arguments) > 1 {
 
+			result := readFile(arguments[1])
+			writeToFile(result, arguments[1])
+		} else {
+			writeToFile("file does not exist", fileName)
+		}
+	case "pwd":
+		dir, err := os.Getwd()
+		if err != nil {
+			writeToFile("error getting current directory", fileName)
+		} else {
+			writeToFile(dir, fileName)
+		}
+	case "type":
+		if len(arguments) > 1 {
+			writeToFile(arguments[1], fileName)
+		} else {
+			writeToFile("missing argument", fileName)
+		}
+	default:
+		writeToFile("unknown command: "+arguments[0], fileName)
+	}
 }
 
 // //////////////////////////////////////////////
