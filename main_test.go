@@ -133,7 +133,7 @@ func TestTypeCommand(t *testing.T) {
 	tests := []struct {
 		name      string
 		arguments []string
-		setupFile func()  
+		setupFile func()
 		expectOut string
 	}{
 		{"Internal command: echo", []string{"echo"}, nil, "echo is a shell builtin\n"},
@@ -164,6 +164,50 @@ func TestTypeCommand(t *testing.T) {
 
 			if output != tt.expectOut {
 				t.Errorf("expected output %q, got %q", tt.expectOut, output)
+			}
+		})
+	}
+}
+
+func TestPwdCommand(t *testing.T) {
+	tests := []struct {
+		name      string
+		arguments []string
+		expectOut string
+		expectErr bool
+	}{
+		{
+			"Pwd with no arguments",
+			[]string{},
+			"c:\\Users\\Armin\\Desktop\\Project\n",
+			false,
+		},
+		{
+			"Pwd with arguments",
+			[]string{"someArg"},
+			"pwd command does not have any argument\n",
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			oldOut := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			defer func() { os.Stdout = oldOut }()
+			service.PwdCommand(tt.arguments)
+			w.Close()
+			var buf bytes.Buffer
+			buf.ReadFrom(r)
+			actualOutput := buf.String()
+			if tt.expectErr {
+				if actualOutput != tt.expectOut {
+					t.Errorf("expected error %q, got %q", tt.expectOut, actualOutput)
+				}
+			} else {
+				if actualOutput != tt.expectOut {
+					t.Errorf("expected output %q, got %q", tt.expectOut, actualOutput)
+				}
 			}
 		})
 	}
