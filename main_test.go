@@ -17,7 +17,12 @@ func TestExitCommand(t *testing.T) {
 		expectExit int
 	}{
 		{"No argument", []string{}, "exit status 0", 0},
+		{"Explicit exit 0", []string{"0"}, "", 0},
 		{"Valid exit status", []string{"2"}, "", 2},
+		{"Max int exit status", []string{"2147483647"}, "", 2147483647},
+		{"Negative exit status", []string{"-1"}, "", -1},
+		{"Whitespace in number", []string{" 1 "}, "invalid exit status argument", -1},
+		{"Float exit status", []string{"1.5"}, "invalid exit status argument", -1},
 		{"Invalid exit status", []string{"abc"}, "invalid exit status argument", -1},
 		{"Too many arguments", []string{"1", "2"}, "too many arguments", -1},
 	}
@@ -56,7 +61,7 @@ func TestHelperProcess(t *testing.T) {
 		t.Skip("Skipping helper process test")
 	}
 
-	args := os.Args[2:] 
+	args := os.Args[2:]
 	if len(args) > 1 {
 		println("too many arguments")
 		os.Exit(1)
