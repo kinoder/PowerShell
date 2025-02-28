@@ -79,7 +79,7 @@ func TestEchoCommand(t *testing.T) {
 			w.Close()
 			var buf bytes.Buffer
 			_, _ = buf.ReadFrom(r)
-			os.Stdout = old 
+			os.Stdout = old
 			output := buf.String()
 			if output != tt.expectOut+"\n" {
 				t.Errorf("expected output %q, got %q", tt.expectOut, output)
@@ -88,6 +88,46 @@ func TestEchoCommand(t *testing.T) {
 	}
 }
 
+func TestCatCommand(t *testing.T) {
+	tests := []struct {
+		name      string
+		arguments []string
+		setupFile func()
+		expectOut string
+	}{
+		{"Empty file", []string{"empty.txt"}, func() {
+			os.WriteFile("empty.txt", []byte{}, 0644)
+		}, ""},
+		{"Single line text", []string{"single.txt"}, func() {
+			os.WriteFile("single.txt", []byte("Hello, World!"), 0644)
+		}, "Hello, World!"},
+		{"Multiple lines", []string{"multiple.txt"}, func() {
+			os.WriteFile("multiple.txt", []byte("Hello\nWorld\nThis is a test"), 0644)
+		}, "Hello\nWorld\nThis is a test"},
+		{"File with special characters", []string{"special.txt"}, func() {
+			os.WriteFile("special.txt", []byte("Line 1: $HOME\nLine 2: `echo`"), 0644)
+		}, "Line 1: $HOME\nLine 2: `echo`"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setupFile()
+			defer os.Remove(tt.arguments[0])
+			old := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			service.CatCommand(tt.arguments)
+			w.Close()
+			var buf bytes.Buffer
+			_, _ = buf.ReadFrom(r)
+			os.Stdout = old
+			output := buf.String()
+			if output != tt.expectOut+"\n" {
+				t.Errorf("expected output %q, got %q", tt.expectOut, output)
+			}
+		})
+	}
+}
 
 func TestHelperProcess(t *testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
