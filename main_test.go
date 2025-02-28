@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"hamkaran_system/bootcamp/final/project/service"
 	"os"
 	"os/exec"
 	"strconv"
@@ -55,6 +56,38 @@ func TestExitCommand(t *testing.T) {
 		})
 	}
 }
+
+func TestEchoCommand(t *testing.T) {
+	tests := []struct {
+		name      string
+		arguments []string
+		expectOut string
+	}{
+		{"Simple text", []string{"Hello", "World"}, "Hello World"},
+		{"Text with double quotes", []string{"\"Hello World\""}, "Hello World"},
+		{"Text with single quotes", []string{"'Hello World'"}, "Hello World"},
+		{"Text with environment variable", []string{"$PATH"}, os.Getenv("PATH")},
+		{"Text with escaped character", []string{"\"Hello\\nWorld\""}, "Hello\nWorld"},
+		{"Text with multiple spaces", []string{"Hello", "    World"}, "Hello     World"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			old := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			service.EchoCommand(tt.arguments)
+			w.Close()
+			var buf bytes.Buffer
+			_, _ = buf.ReadFrom(r)
+			os.Stdout = old 
+			output := buf.String()
+			if output != tt.expectOut+"\n" {
+				t.Errorf("expected output %q, got %q", tt.expectOut, output)
+			}
+		})
+	}
+}
+
 
 func TestHelperProcess(t *testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
