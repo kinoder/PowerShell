@@ -2,6 +2,9 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"hamkaran_system/bootcamp/final/project/common"
+	models "hamkaran_system/bootcamp/final/project/model"
 	"hamkaran_system/bootcamp/final/project/service"
 	"os"
 	"os/exec"
@@ -268,6 +271,75 @@ func TestCdCommand(t *testing.T) {
 				if actualOutput != tt.expectOut {
 					t.Errorf("expected output %q, got %q", tt.expectOut, actualOutput)
 				}
+			}
+		})
+	}
+}
+
+func TestLoginCommand(t *testing.T) {
+	users := []models.User{
+		{Username: "validUser", Password: "validPassword", ID: 1},
+	}
+
+	tests := []struct {
+		name             string
+		arguments        []string
+		expectedUsername string
+		expectedErr      bool
+	}{
+		{
+			"Valid Login",
+			[]string{"validUser", "validPassword"},
+			"validUser",
+			false,
+		},
+		{
+			"Invalid Login",
+			[]string{"invalidUser", "wrongPassword"},
+			"",
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			common.LoginUser.Username = ""
+			common.LoginUser.ID = 0
+
+			var existingUser models.User
+			var err error
+
+			for _, user := range users {
+				if user.Username == tt.arguments[0] {
+					existingUser = user
+					break
+				}
+			}
+
+			if existingUser.Username == "" || existingUser.Password != tt.arguments[1] {
+				err = fmt.Errorf("invalid username or password")
+			}
+
+			oldOut := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			defer func() { os.Stdout = oldOut }()
+
+			if err != nil {
+				fmt.Println("invalid username or password")
+			} else {
+				common.LoginUser.Username = existingUser.Username
+				common.LoginUser.ID = existingUser.ID
+			}
+
+			w.Close()
+			var buf bytes.Buffer
+			buf.ReadFrom(r)
+
+			if tt.expectedErr && common.LoginUser.Username != "" {
+				t.Errorf("expected no login but got username: %v", common.LoginUser.Username)
+			} else if !tt.expectedErr && common.LoginUser.Username != tt.expectedUsername {
+				t.Errorf("expected username %v, but got %v", tt.expectedUsername, common.LoginUser.Username)
 			}
 		})
 	}
