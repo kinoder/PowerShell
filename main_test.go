@@ -213,6 +213,66 @@ func TestPwdCommand(t *testing.T) {
 	}
 }
 
+func TestCdCommand(t *testing.T) {
+	tests := []struct {
+		name      string
+		arguments []string
+		expectOut string
+		expectErr bool
+	}{
+		{
+			"Cd with no arguments",
+			[]string{},
+			"please enter a path\n",
+			true,
+		},
+		{
+			"Cd with too many arguments",
+			[]string{"path1", "path2"},
+			"too many arguments\n",
+			true,
+		},
+		{
+			"Cd to a valid directory",
+			[]string{"C:\\Users\\Armin\\Desktop\\Project"},
+			"",
+			false,
+		},
+		{
+			"Cd to a non-existent directory",
+			[]string{"nonexistent_directory"},
+			"directory nonexistent_directory does not exist\n",
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			oldOut := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			defer func() { os.Stdout = oldOut }()
+
+			service.CdCommand(tt.arguments)
+
+			w.Close()
+			var buf bytes.Buffer
+			buf.ReadFrom(r)
+
+			actualOutput := buf.String()
+			if tt.expectErr {
+				if actualOutput != tt.expectOut {
+					t.Errorf("expected error %q, got %q", tt.expectOut, actualOutput)
+				}
+			} else {
+				if actualOutput != tt.expectOut {
+					t.Errorf("expected output %q, got %q", tt.expectOut, actualOutput)
+				}
+			}
+		})
+	}
+}
+
 func TestHelperProcess(t *testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
 		t.Skip("Skipping helper process test")
