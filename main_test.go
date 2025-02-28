@@ -129,6 +129,46 @@ func TestCatCommand(t *testing.T) {
 	}
 }
 
+func TestTypeCommand(t *testing.T) {
+	tests := []struct {
+		name      string
+		arguments []string
+		setupFile func()  
+		expectOut string
+	}{
+		{"Internal command: echo", []string{"echo"}, nil, "echo is a shell builtin\n"},
+		{"Internal command: cat", []string{"cat"}, nil, "cat is a shell builtin\n"},
+		{"File exists in PATH", []string{"ls"}, nil, "ls: command not found\n"},
+		{"Command not found", []string{"nonexistentcommand"}, nil, "nonexistentcommand: command not found\n"},
+		{"Missing argument", []string{}, nil, "missing arguments or too many arguments\n"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.setupFile != nil {
+				tt.setupFile()
+			}
+
+			old := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+
+			service.TypeCommand(tt.arguments)
+
+			w.Close()
+			var buf bytes.Buffer
+			_, _ = buf.ReadFrom(r)
+			os.Stdout = old
+
+			output := buf.String()
+
+			if output != tt.expectOut {
+				t.Errorf("expected output %q, got %q", tt.expectOut, output)
+			}
+		})
+	}
+}
+
 func TestHelperProcess(t *testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
 		t.Skip("Skipping helper process test")
